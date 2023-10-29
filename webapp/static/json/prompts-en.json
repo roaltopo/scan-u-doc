@@ -5,7 +5,7 @@
     "widget_name": "{{widget_name_1}}",
     "image": "img/icon-text.svg",
     "welcome_message": "Welcome! Feel free to ask any questions about the selected text. I'm here to provide you with insightful answers.",
-    "description": "Our mission is to simplify text processing and enhance information retrieval using cutting-edge LLM models. Explore our project on <a href=\"#\">GitHub</a>.",
+    "description": "Our mission is to simplify text processing and enhance information retrieval using cutting-edge LLM models. Explore our project on <a href=\"https://github.com/roaltopo/scan-u-doc\">GitHub</a>.",
     "display_welcome_message": true,
     "chat_minlength": 2,
     "chat_maxlength": 1000,

@@ -2,11 +2,11 @@
 
 **Intel® oneAPI Hackathon 2023: The LLM Challenge**
 
-Live Demo - [https://huggingface.co/spaces/roaltopo/scan-u-doc]()
+Live Demo - https://huggingface.co/spaces/roaltopo/scan-u-doc
 
-Blog - [https://medium.com/@roaltopo/unleashing-textual-understanding-with-scanudoc-f2e12499ae11]()
+Blog - https://medium.com/@roaltopo/unleashing-textual-understanding-with-scanudoc-f2e12499ae11
 
-Author: [https://www.linkedin.com/in/rodolfo-torres-p]()
+Author: https://www.linkedin.com/in/rodolfo-torres-p
 
 ---
 
@@ -62,26 +62,29 @@ The optimization approach has relied on the following tools from the **Intel® A
 
 ### **Step-by-step instructions for deploying the solution**
 
-* Ensure that you have installed both dockerMake sure you have already installed docker ([https://docs.docker.com/get-docker/](https://docs.docker.com/get-docker/)) and docker-compose ([https://docs.docker.com/compose/](https://docs.docker.com/compose/)).
+* Ensure that you have installed both dockerMake sure you have already installed docker (https://docs.docker.com/get-docker/) and docker-compose (https://docs.docker.com/compose/).
 * Clone the Repository
 
 ```python
-$ git clone https://github.com/roaltopo/scan-u-doc
- $ cd scan-u-doc
+ $ git clone https://github.com/roaltopo/scan-u-doc$ cd scan-u-doc
 ```
 
 * Start the webapp demo.
 
 ```python
 # Docker command: build and start containers.
-  $ docker-compose up --build
+ $ docker-compose up --build
+```
+
+```
+
 ```
 
 * Go to:[http://localhost:7860]()
-
 
 ### **Key Learnings**
 
 1. Training LLM models to deliver accurate and context-aware responses by leveraging their text generation and comprehension capabilities.
 2. Implementing applications on the OneApi platform and optimizing AI software using the Intel® AI Analytics Toolkit.
 3. Creating a chatbot application that integrates with pre-trained LLM models and deploying it on a publicly accessible webpage.
+
