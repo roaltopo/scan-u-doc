@@ -1,0 +1,10 @@
+fastapi==0.103.2
+uvicorn==0.23.2
+optimum[neural-compressor]==1.8.7
+neural-compressor==2.1.1
+intel_extension_for_pytorch==2.0.100
+torch==2.0.1
+transformers==4.29.2
+pydantic==2.4.2
+pypdf2==3.0.1
+python-multipart==0.*

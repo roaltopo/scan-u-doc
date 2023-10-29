@@ -1,0 +1,12 @@
+version: '3.7'
+
+services:
+  text_talk:
+    build:
+      context: '.'
+    image: scan-u-doc:v1
+    ports:
+      - 7860:7860
+    environment:
+      - APACHE_RUN_USER=#1000
+      - APACHE_RUN_GROUP=#1000

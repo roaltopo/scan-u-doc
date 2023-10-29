@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="47"
+   height="47"
+   viewBox="0 0 47 47"
+   fill="none"
+   version="1.1"
+   id="svg13"
+   sodipodi:docname="icon-menu.svg"
+   inkscape:version="1.1.2 (b8e25be833, 2022-02-05)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview15"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     showgrid="false"
+     showguides="true"
+     inkscape:guide-bbox="true"
+     inkscape:zoom="17.510638"
+     inkscape:cx="20.187728"
+     inkscape:cy="23.014581"
+     inkscape:window-width="1920"
+     inkscape:window-height="1009"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g6">
+    <sodipodi:guide
+       position="23.414338,51.340219"
+       orientation="1,0"
+       id="guide11476" />
+    <sodipodi:guide
+       position="42.716889,23.35723"
+       orientation="0,-1"
+       id="guide11478" />
+  </sodipodi:namedview>
+  <g
+     clip-path="url(#clip0_39_15955)"
+     id="g6">
+    <path
+       d="M0.935581 23.6383C0.935581 11.2244 10.9991 1.16089 23.413 1.16089C35.8269 1.16089 45.8904 11.2244 45.8904 23.6383C45.8904 36.0522 35.8269 46.1157 23.413 46.1157C10.9991 46.1157 0.935581 36.0522 0.935581 23.6383Z"
+       stroke="white"
+       id="path2" />
+    <circle
+       style="fill:#ffffff;fill-opacity:1;stroke-width:0.638084"
+       id="path11248"
+       cx="23.348688"
+       cy="15.953233"
+       r="2.7329853" />
+    <circle
+       style="fill:#ffffff;fill-opacity:1;stroke-width:0.638084"
+       id="path11248-9"
+       cx="23.348904"
+       cy="23.751345"
+       r="2.7329853" />
+    <circle
+       style="fill:#ffffff;fill-opacity:1;stroke-width:0.638084"
+       id="path11248-9-8"
+       cx="23.348688"
+       cy="31.376102"
+       r="2.7329853" />
+  </g>
+  <defs
+     id="defs11">
+    <clipPath
+       id="clip0_39_15955">
+      <rect
+         width="47"
+         height="47"
+         fill="white"
+         id="rect8" />
+    </clipPath>
+  </defs>
+</svg>

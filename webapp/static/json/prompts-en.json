@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "name": "Answerio",
+    "widget_name": "{{widget_name_1}}",
+    "image": "img/icon-text.svg",
+    "welcome_message": "Welcome! Feel free to ask any questions about the selected text. I'm here to provide you with insightful answers.",
+    "description": "Our mission is to simplify text processing and enhance information retrieval using cutting-edge LLM models. Explore our project on <a href=\"#\">GitHub</a>.",
+    "display_welcome_message": true,
+    "chat_minlength": 2,
+    "chat_maxlength": 1000,
+    "max_num_chats_api": 8
+  },
+  {
+    "id": 2,
+    "name": "Answerio",
+    "widget_name": "{{widget_name_2}}",
+    "image": "img/icon-file.svg",
+    "welcome_message": "Welcome! Feel free to ask any questions about the selected text. I'm here to provide you with insightful answers.",
+    "description": "<h6>Tips:</h6> Haz las preguntas que quieras acerca del texto",
+    "display_welcome_message": true,
+    "chat_minlength": 2,
+    "chat_maxlength": 1000,
+    "max_num_chats_api": 8
+  },
+  {
+    "id": 3,
+    "name": "Answerio",
+    "widget_name": "{{widget_name_3}}",
+    "image": "img/icon-webpage.svg",
+    "welcome_message": "Welcome! Feel free to ask any questions about the selected text. I'm here to provide you with insightful answers.",
+    "description": "<h6>Tips:</h6> Haz las preguntas que quieras acerca del texto",
+    "display_welcome_message": true,
+    "chat_minlength": 3,
+    "chat_maxlength": 1000,
+    "max_num_chats_api": 8
+  }
+]

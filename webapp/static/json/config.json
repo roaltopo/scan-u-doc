@@ -1,0 +1,14 @@
+{ 
+	"use_text_stream": true,
+	"display_contacts_user_list": true,
+	"display_avatar_in_chat": true,
+	"display_copy_text_button_in_chat": true,
+	"display_audio_button_answers": true,
+	"display_microphone_in_chat": true,
+	"microphone_speak_lang": "en-US",
+	"google_voice":"Google US English",
+  	"google_voice_lang_code":"en-US",
+	"filter_badwords": true,
+	"chat_history": true,
+	"chat_font_size": "17px"
+}
