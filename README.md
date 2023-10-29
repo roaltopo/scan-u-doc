@@ -76,11 +76,8 @@ The optimization approach has relied on the following tools from the **Intel® A
  $ docker-compose up --build
 ```
 
-```
 
-```
-
-* Go to:[http://localhost:7860]()
+* Go to: http://localhost:7860
 
 ### **Key Learnings**
 
