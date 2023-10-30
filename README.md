@@ -2,7 +2,7 @@
 
 **Intel® oneAPI Hackathon 2023: The LLM Challenge**
 
-Live Demo - https://huggingface.co/spaces/roaltopo/scan-u-doc
+Live Demo - https://roaltopo-scan-u-doc.hf.space
 
 Blog - https://medium.com/@roaltopo/unleashing-textual-understanding-with-scanudoc-f2e12499ae11
 
