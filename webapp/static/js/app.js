@@ -202,9 +202,17 @@ async function getResponse(prompt) {
 
 	try {
 		let question = array_messages[array_messages.length - 1].content;
+		let curr_settings = getSettings();
+
+		allow_bool = false;
+		if(curr_settings['answersToggle']){
+			allow_bool = true;
+		}		
+
 		// Datos a enviar al servidor
 		var questionData = {
-			question: question
+			question: question,
+			allow_bool: allow_bool,
 		};
 
 		//console.log(message);

@@ -8,12 +8,14 @@ from fastapi.responses import JSONResponse
 from io import BytesIO
 import PyPDF2
 from newspaper import Article
+import torch
+from transformers import AutoModelForMultipleChoice, AutoTokenizer
 
-model_name = "roaltopo/scan-u-doc_question-answer"
-qa_pipeline = pipeline(
-    "question-answering",
-    model=model_name,
-)
+qa_pipeline = pipeline("question-answering", model="roaltopo/scan-u-doc_question-answer")
+bool_q_pipeline = pipeline("text-classification",  model="roaltopo/scan-u-doc_bool-question")
+model_path = "roaltopo/scan-u-doc_bool-answer"
+bool_a_tokenizer = AutoTokenizer.from_pretrained(model_path)
+bool_a_model = AutoModelForMultipleChoice.from_pretrained(model_path)
 
 app = FastAPI()
 
@@ -27,6 +29,19 @@ class TextInfo(BaseModel):
 
 class QuestionInfo(BaseModel):
     question: str
+    allow_bool: Optional[bool] = False
+
+def predict_boolean_answer(text, question):
+    id2label = {0: "NO", 1: "YES"}
+    text += '\n'
+    question += '\n'
+    inputs = bool_a_tokenizer([[text, question+'no'], [text, question+'yes']], return_tensors="pt", padding=True)
+    labels = torch.tensor(0).unsqueeze(0)
+    
+    outputs = bool_a_model(**{k: v.unsqueeze(0) for k, v in inputs.items()}, labels=labels)
+    logits = outputs.logits
+    
+    return {'answer': id2label[int(logits.argmax().item())]}
 
 @app.post("/store_text/{uuid}")
 async def store_text(uuid: str, text_info: TextInfo):
@@ -97,14 +112,21 @@ async def upload_file(uuid: str, file: UploadFile = File(...)):
 
 @app.post("/answer_question/{uuid}")
 async def answer_question(uuid: str, question_info: QuestionInfo):
+    bool_activate = question_info.allow_bool
+
     question = question_info.question
 
     # Verifica si el texto con el ID existe en el diccionario
     if uuid not in text_storage:
         return {'error': 'Text not found'}
 
-    r = qa_pipeline(question=question, context=text_storage[uuid]['text'], top_k=10)
-    return r[0]
+    answer = qa_pipeline(question=question, context=text_storage[uuid]['text'])
+    if bool_activate :
+        is_bool_inference = bool_q_pipeline(question)
+        if is_bool_inference[0]['label'] == 'YES' :
+            answer = predict_boolean_answer(answer['answer'], question)
+
+    return answer
 
 
 app.mount("/", StaticFiles(directory="static", html=True), name="static")
