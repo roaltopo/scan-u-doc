@@ -26,6 +26,8 @@
     <link rel="icon" type="image/png" sizes="16x16" href="fav/favicon-16x16.png">
     <link rel="manifest" href="fav/site.webmanifest">
     <link rel="mask-icon" href="fav/safari-pinned-tab.svg" color="#5bbad5">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
   </head>
   <body>
 
@@ -99,7 +101,13 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{button_close_modal}"></button>
             </div>
             <div class="modal-body">
-                <textarea id="textArea" rows="4" cols="50"></textarea>
+                <div class="alert alert-info" role="alert">
+                  Please enter a text of maximum 4000 characters.
+                </div>
+                <textarea id="textArea" class="form-control" rows="4" maxlength="4000"></textarea>
+                <div class="mt-2">
+                  <span id="charCount">4000</span> characters remaining
+                </div>
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{button_close_modal}}</button>
@@ -117,13 +125,46 @@
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{button_close_modal}"></button>
             </div>
             <div class="modal-body">
+              <div class="alert alert-info" role="alert">
+                You can upload a PDF or TXT file, maximum 1MB in size.<br>
+                Only the first 4000 characters of the text will be processed.
+              </div>
               <form id="file-form" enctype="multipart/form-data">
-                <input id="fileInput" type="file" name="file" accept=".pdf">
+                <div class="input-group mb-3">
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input" id="fileInput" name="file" accept=".pdf,.txt">
+                        <label class="custom-file-label" for="fileInput">Choose file</label>
+                    </div>
+                </div>
               </form>
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{button_close_modal}}</button>
               <button type="button" class="btn btn-primary" id="sendButton2">Send</button>
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <div class="modal fade" tabindex="-1" id="modalUrl">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Enter the Webpage URL</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{button_close_modal}"></button>
+            </div>
+            <div class="modal-body">
+              <div class="alert alert-info" role="alert">
+                You can input a URL from a news website.<br>Note that with other types of websites, the functionality may not work as effectively.
+              </div>
+              <div class="form-group">
+                <label for="url">URL:</label>
+                <input type="text" class="form-control" id="url" value="">
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{button_close_modal}}</button>
+              <button type="button" class="btn btn-primary" id="sendButton3">Send</button>
             </div>
         </div>
     </div>

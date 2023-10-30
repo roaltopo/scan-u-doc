@@ -595,12 +595,26 @@ function hideChat() {
 }
 
 // Agrega el evento para el botón "Enviar"
-document.getElementById('sendButton').addEventListener('click', function () {
+$('#sendButton').click(function (evt) {
+	evt.preventDefault();
+
 	var textData = {
 		text: $('#textArea').val(),
-		pdf: null,
-		html_url: null
 	};
+
+	// Configurar la posición de Toastr en la parte superior
+	toastr.options.positionClass = 'toast-top-center';
+
+	// Verificar si la variable de texto está vacía
+    if (textData.text.trim() === '') {
+        toastr.error("Error: Text cannot be empty.");
+        return;
+    }
+
+	// Deshabilitar el botón y agregar un spinner
+    var sendButton = $('#sendButton');
+    sendButton.prop('disabled', true);
+    sendButton.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sending...');
 
 	// Realiza una llamada POST al endpoint /store_text
 	$.ajax({
@@ -609,38 +623,144 @@ document.getElementById('sendButton').addEventListener('click', function () {
 		data: JSON.stringify(textData),
 		contentType: "application/json",
 		success: function (data) {
+			// Habilitar el botón nuevamente
+            sendButton.prop('disabled', false);
+            sendButton.html('Send');
+
 			$('#textArea').val('');
 			// Cierra el modal después de enviar el texto
 			textModal.hide();
 			displayChat(chatId);
-		}
+		},
+        error: function (xhr, status, error) {
+            // Verificar si hay un código de error del backend
+            if (xhr.status === 400 || xhr.status === 500) {
+                toastr.error(`Error: ${xhr.status} - ${error}`);
+            } else {
+                toastr.error("Error: Connection refused. Please try again later.");
+            }
+
+            // Habilitar el botón nuevamente
+            sendButton.prop('disabled', false);
+            sendButton.html('Send');
+        }
 	});
 });
 
 $('#sendButton2').click(function (evt) {
-	evt.preventDefault();
-	var formData = new FormData($('#file-form')[0]);
+    evt.preventDefault();
+    var formData = new FormData($('#file-form')[0]);
+    var sendButton = $('#sendButton2');
 
-	$.ajax({
-		url: `/upload_file/${uuid}`,
-		type: 'POST',
-		data: formData,
-		async: false,
-		cache: false,
-		contentType: false,
-		processData: false,
-		success: function (data) {
-			$('#fileInput').val('');
-			// Cierra el modal después de enviar el texto
-			textModal.hide();
-			displayChat(chatId);
-		},
-		error: function (error) {
-			console.log(error);
-			alert('Error al cargar el archivo');
-		}
-	});
+    // Configurar la posición de Toastr en la parte superior
+    toastr.options.positionClass = 'toast-top-center';
+
+    var fileInput = $('#fileInput')[0];
+    var fileSize = fileInput.files[0].size; // Tamaño en bytes
+    var maxSize = 1*1024*1024; // 1MB en bytes
+
+    // Validar el tamaño del archivo
+    if (fileSize > maxSize) {
+        toastr.error('Error: File size exceeds 1MB limit.');
+        return;
+    }
+
+    // Deshabilitar el botón y agregar un spinner
+    sendButton.prop('disabled', true);
+    sendButton.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading...');
+
+    $.ajax({
+        url: `/upload_file/${uuid}`,
+        type: 'POST',
+        data: formData,
+        async: false,
+        cache: false,
+        contentType: false,
+        processData: false,
+        success: function (data) {
+            $('#fileInput').val('');
+            // Habilitar el botón nuevamente
+            sendButton.prop('disabled', false);
+            sendButton.html('Send');
+
+            // Cierra el modal después de enviar el texto
+            textModal.hide();
+            displayChat(chatId);
+        },
+        error: function (xhr, status, error) {
+            // Mostrar mensaje de error con Toastr
+            toastr.error('Error uploading the file');
+
+            // Habilitar el botón nuevamente
+            sendButton.prop('disabled', false);
+            sendButton.html('Send');
+        }
+    });
 });
+
+
+$('#sendButton3').click(function () {
+    var textData = {
+        html_url: $('#url').val(),
+    };
+
+	// Configurar la posición de Toastr en la parte superior
+	toastr.options.positionClass = 'toast-top-center';
+
+    var sendButton = $('#sendButton3');
+
+    // Verificar si la variable de texto está vacía
+    if (textData.html_url.trim() === '') {
+        toastr.error("Error: URL cannot be empty.");
+        return;
+    }
+
+	// Validar la URL
+    var urlRegex = new RegExp('^(https?:\\/\\/)?'+ 
+    '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ 
+    '((\\d{1,3}\\.){3}\\d{1,3}))'+ 
+    '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ 
+    '(\\?[;&a-z\\d%_.~+=-]*)?'+ 
+    '(\\#[-a-z\\d_]*)?$','i');
+    if (!urlRegex.test(textData.html_url)) {
+        toastr.error("Error: Invalid URL.");
+        return;
+    }
+
+    // Deshabilitar el botón y agregar un spinner
+    sendButton.prop('disabled', true);
+    sendButton.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sending...');
+
+    // Realiza una llamada POST al endpoint /store_text
+    $.ajax({
+        type: "POST",
+        url: `/store_text/${uuid}`,
+        data: JSON.stringify(textData),
+        contentType: "application/json",
+        success: function (data) {
+            $('#url').val('');
+			// Habilitar el botón nuevamente
+            sendButton.prop('disabled', false);
+            sendButton.html('Send');
+			
+            // Cierra el modal después de enviar el texto
+            textModal.hide();
+            displayChat(chatId);
+        },
+        error: function (xhr, status, error) {
+            if (xhr.status === 0) {
+                toastr.error('Error: Connection refused. Please try again later.');
+            } else if (xhr.status === 400 || xhr.status === 500) {
+                toastr.error(`Error: ${xhr.status} - ${error}`);
+            }
+
+            // Habilitar el botón nuevamente
+            sendButton.prop('disabled', false);
+            sendButton.html('Send');
+        }
+    });
+});
+
 
 
 
@@ -653,6 +773,11 @@ $(document).delegate(".start-chat", "click", function () {
 		textModal.show();
 	} else if (chatId == 1) {
 		textModal = new bootstrap.Modal(document.getElementById('modalFile'), {
+			keyboard: false
+		});
+		textModal.show();
+	} else if (chatId == 2) {
+		textModal = new bootstrap.Modal(document.getElementById('modalUrl'), {
 			keyboard: false
 		});
 		textModal.show();
@@ -1473,5 +1598,13 @@ $(document).ready(function () {
 		recognition.lang = settings.microphoneLanguage;
 		localStorage.setItem('text-talk-settings', JSON.stringify(settings));
 		$('#modalConfig').modal('hide');
+	});
+
+	// Maneja el conteo de caracteres
+	$('#textArea').on('input', function () {
+		var maxLength = 4000;
+		var currentLength = $(this).val().length;
+		var remaining = maxLength - currentLength;
+		$('#charCount').text(remaining);
 	});
 });
