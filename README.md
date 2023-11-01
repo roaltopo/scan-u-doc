@@ -64,7 +64,7 @@ Overall, the achieved performance is 2.29x times faster compared to the baseline
 |     ├── qa_finetune.py                 # QA model finetuning generation.
 |     ├── is_boolean_classifier.ipynb    # Notebook for boolean question classifier model.
 |     ├── yes_no_answer.ipynb            # Notebook for yes/no answer detection model.
-|     └─── optimize-qa_xpu.ipynb         # Generate optimized QA model and benchmarking.
+|     └── optimize-qa_xpu.ipynb          # Generate optimized QA model and benchmarking.
 |
 └─── webapp                              # Docker-enabled web application
 ```
@@ -75,14 +75,18 @@ Overall, the achieved performance is 2.29x times faster compared to the baseline
 * Clone the Repository
 
 ```python
-$ git clone https://github.com/roaltopo/scan-u-doc$ cd scan-u-doc
+ $ git clone https://github.com/roaltopo/scan-u-doc
+ $ cd scan-u-doc
 ```
 
 * Start the webapp demo.
 
 ```python
-# Docker command: build and start containers.
- $ docker-compose up --build
+  # Move to the docker folder
+  $ cd webapp
+
+  # Build using docker-compose
+  $ docker-compose up --build -d
 ```
 
 * Go to: http://localhost:7860
