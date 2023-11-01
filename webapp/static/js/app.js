@@ -1,3 +1,17 @@
+/*
+    Author: Rodolfo Torres
+    Email: rodolfo.torres@outlook.com
+    LinkedIn: https://www.linkedin.com/in/rodolfo-torres-p
+    License: This code is licensed under GPL-3.0
+
+	The code is licensed under the GPL-3.0 license, which is a widely used open-source license, ensuring that any derivative work is also open source. 
+	It grants users the freedom to use, modify, and distribute the software, as well as any modifications or extensions made to it. 
+	However, any modified versions of the software must also be licensed under GPL-3.0.
+
+	For more details, please refer to the full text of the GPL-3.0 license at https://www.gnu.org/licenses/gpl-3.0.html.
+*/
+
+
 /*/ Not change any values of the variables below, 
 use the "json/config.json" file to make your settings. /*/
 let data_index = "";
@@ -18,7 +32,6 @@ let chat_maxlength = 0;
 let lang_index = 0;
 let scrollPosition = 0;
 
-let is_model_turbo = false;
 let use_text_stream = false;
 let display_microphone_in_chat = false;
 let display_avatar_in_chat = false;
@@ -56,6 +69,13 @@ if (window.location.protocol === 'file:') {
 //Loads the characters from the config.json file and appends them to the initial slider
 loadData("json/config.json", ["json/prompts-" + user_prompt_lang + ".json", "json/lang.json", "json/badwords.json"]);
 
+/**
+ * Function to load data from the given URL and an array of URLs using Promise.all and map functions.
+ *
+ * @param {string} url - The URL to fetch the data from.
+ * @param {Array} urls - An array of URLs to fetch additional data from.
+ * @returns {Promise} - A Promise that resolves with the fetched data and updates the necessary variables.
+ */
 function loadData(url, urls) {
 	// Fetch data from the given url and an array of urls using Promise.all and map functions
 	return Promise.all([fetch(url).then(res => res.json()), ...urls.map(url => fetch(url).then(res => res.json()))])
@@ -135,6 +155,11 @@ function loadData(url, urls) {
 		}).catch(err => { throw err })
 }
 
+/**
+ * Function to retrieve the current date and time.
+ *
+ * @returns {string} - A string representing the current date and time in a localized format.
+ */
 function currentDate() {
 	const timestamp = new Date();
 	return timestamp.toLocaleString();
@@ -144,7 +169,9 @@ function currentDate() {
 // Define a placeholder for the image
 const placeholder = "img/placeholder.svg";
 
-// Check if the image is in the visible area
+/**
+ * Event listener for the scroll event that checks if the image is in the visible area.
+ */
 $(window).on("scroll", function () {
 	$("img[data-src]").each(function () {
 		if (isElementInViewport($(this))) {
@@ -154,7 +181,12 @@ $(window).on("scroll", function () {
 	});
 });
 
-// Helper function to check if the element is in the visible area
+/**
+ * Helper function to check if the element is in the visible area.
+ *
+ * @param {Object} el - The element to be checked.
+ * @returns {boolean} - A boolean indicating whether the element is in the visible area.
+ */
 function isElementInViewport(el) {
 	const rect = el.get(0).getBoundingClientRect();
 	return (
@@ -165,14 +197,19 @@ function isElementInViewport(el) {
 	);
 }
 
-//Main function of GPT-3 chat API
+/**
+ * Main function of the chat API responsible for getting a response based on the provided prompt.
+ *
+ * @param {string} prompt - The prompt or message from the user.
+ * @returns {Promise<void>} - A Promise that resolves when the response is obtained and displayed in the chat.
+ */
 async function getResponse(prompt) {
 
 	//Conversation history
 	array_chat.push({ "name": "User", "message": prompt, "isImg": false, "date": currentDate() })
 	array_messages = [];
 
-	//Converting chat to turbo API model
+	//Converting chat to API model
 	for (let i = 0; i < array_chat.length; i++) {
 		let message = { "role": "", "content": "" };
 
@@ -194,11 +231,6 @@ async function getResponse(prompt) {
 		var slice_messages = max_num_chats_api - 2;
 		array_messages = array_messages.slice(0, 2).concat(array_messages.slice(-slice_messages));
 	}
-	/*
-	const params = new URLSearchParams();
-	params.append('array_chat', JSON.stringify(array_messages));
-	params.append('prompts_name', prompts_name);
-	*/
 
 	try {
 		let question = array_messages[array_messages.length - 1].content;
@@ -209,13 +241,12 @@ async function getResponse(prompt) {
 			allow_bool = true;
 		}		
 
-		// Datos a enviar al servidor
+		// Data to send to the server
 		var questionData = {
 			question: question,
 			allow_bool: allow_bool,
 		};
 
-		//console.log(message);
 		const fullPrompt = "That is a responses' example maded in English to test capacities of that chat";
 		const randomID = generateUniqueID();
 		$("#overflow-chat").append(`
@@ -236,20 +267,15 @@ async function getResponse(prompt) {
         </div>
 			`);
 
-		//$(`.${randomID}`).append(fullPrompt);
-		//scrollChatBottom();
-		//OK
-
-		// Realiza una llamada POST al endpoint /answer_question
+		// Make a POST request to the /answer_question endpoint
 		$.ajax({
 			type: "POST",
 			url: `/answer_question/${uuid}`,
 			data: JSON.stringify(questionData),
 			contentType: "application/json",
 			success: function (data) {
-				// La respuesta se encuentra en data.response
+				// The response is in data.answer
 				var response = data.answer;
-				//console.log(data, response);
 
 				$(".cursor").remove();
 				str = $(`.${randomID}`).html();
@@ -279,11 +305,24 @@ async function getResponse(prompt) {
 	}
 }
 
+/**
+ * Function to generate a unique ID with an optional prefix.
+ *
+ * @param {string} prefix - The optional prefix for the generated ID. Default is 'id_'.
+ * @returns {string} - A string representing the unique ID with the specified prefix and timestamp.
+ */
 function generateUniqueID(prefix = 'id_') {
 	const timestamp = Date.now();
 	return `${prefix}${timestamp}`;
 }
 
+/**
+ * Function to stream the chat content based on the received source and randomID.
+ *
+ * @param {EventSource} source - The source of the event stream.
+ * @param {string} randomID - A string representing the unique ID for the chat.
+ * @returns {boolean} - A boolean indicating whether the streaming is successful or not.
+ */
 function streamChat(source, randomID) {
 	let fullPrompt = "";
 	let partPrompt = "";
@@ -339,7 +378,7 @@ function streamChat(source, randomID) {
 			return;
 		}
 
-		var choice = tokens.choices[0]; //is_model_turbo ? tokens.choices[0].delta : tokens.choices[0];
+		var choice = tokens.choices[0];
 		partPrompt = "";
 		if (choice.content || choice.text) {
 			fullPrompt += choice.content || choice.text;
@@ -357,19 +396,26 @@ function streamChat(source, randomID) {
 }
 
 
+/**
+ * Function to save the chat history into the local storage.
+ */
 function saveChatHistory() {
 	/*
 	if (array_widgets[data_index]) {
 		array_widgets[data_index].last_chat = array_chat;
 	}
 	if(chat_history){
-		localStorage.setItem("oracle_chat_v1", JSON.stringify(array_widgets));
+		localStorage.setItem("text_talk_v1", JSON.stringify(array_widgets));
 	}			
 	console.log("Saving...")
 	*/
 }
 
-//Function that appends the AI response in the chat in html
+/**
+ * Function that appends the AI response in the chat in HTML.
+ *
+ * @param {string} response - The response message from the AI.
+ */
 function responseChat(response) {
 
 	for (var i = 0; i < filterBotWords.length; i++) {
@@ -414,6 +460,11 @@ function responseChat(response) {
 	checkClearChatDisplay();
 }
 
+/**
+ * Function to append an image to the chat.
+ *
+ * @param {string} chat - The chat message.
+ */
 function appendChatImg(chat) {
 	const imageID = Date.now();
 	IAimagePrompt = chat.replace("/img ", "");
@@ -448,7 +499,10 @@ function appendChatImg(chat) {
 	$("#chat").val("");
 }
 
-//Function that sends the user's question to the chat in html and to the API
+/**
+ * Function that sends the user's chat message to the chat in HTML and to the API.
+ *
+ */
 function sendUserChat() {
 	let chat = $("#chat").val();
 
@@ -504,7 +558,12 @@ function sendUserChat() {
 	disableChat();
 }
 
-//Send message in chat by pressing enter
+/**
+ * Send a message in the chat by pressing the Enter key.
+ *
+ * @param {object} e - The event object.
+ * @returns {boolean} - Returns false to prevent the default behavior of the Enter key.
+ */
 $("#chat").keypress(function (e) {
 	if (e.which === 13 && !e.shiftKey) {
 		sendUserChat();
@@ -512,26 +571,27 @@ $("#chat").keypress(function (e) {
 	}
 });
 
-
+/**
+ * Event listener for the click event on the chat send button.
+ * Calls the 'sendUserChat' function when the button is clicked.
+ */
 $(".btn-send-chat").on("click", function () {
 	sendUserChat();
 })
 
 
-// Function to shuffle the array
-function shuffleArray(array) {
-	return array.sort(() => Math.random() - 0.5);
-}
-
+/**
+ * Translates text elements in the HTML using the translation object.
+ */
 function translate() {
 	translationObj = lang.translate[lang_index];
 
-	// Loop através de todas as chaves do objeto translationObj
+	// Loop through all the keys in the translationObj object
 	for (let key in translationObj) {
-		// Obtenha o valor da chave atual
+		// Get the value of the current key
 		let value = translationObj[key];
 
-		// Encontre todos os elementos no HTML que contêm o bloco entre {{ e }}
+		// Find all elements in the HTML that contain the block between {{ and }}
 		let elements = document.body.querySelectorAll('*:not(script):not(style)');
 		elements.forEach(function (element) {
 			for (let i = 0; i < element.childNodes.length; i++) {
@@ -540,11 +600,11 @@ function translate() {
 					let text = node.nodeValue;
 					let regex = new RegExp(`{{\\s*${key}\\s*}}`, 'g');
 					if (regex.test(text)) {
-						// Use a propriedade innerHTML para interpretar as tags HTML
+						// Use the innerHTML property to interpret HTML tags
 						node.parentElement.innerHTML = text.replace(regex, value);
 					}
 				} else if (node.nodeType === Node.ELEMENT_NODE) {
-					// Para elementos com atributos HTML, substitua o valor da chave no atributo
+					// For elements with HTML attributes, replace the key's value in the attribute
 					let attributes = node.attributes;
 					for (let j = 0; j < attributes.length; j++) {
 						let attribute = attributes[j];
@@ -559,6 +619,10 @@ function translate() {
 	}
 }
 
+/**
+ * Closes the chat interface and shows the chat options.
+ * Restores the previous scroll position and adjusts the UI accordingly.
+ */
 function closeChat() {
 	hideChat();
 	enableChat();
@@ -573,6 +637,10 @@ function closeChat() {
 	return false;
 }
 
+/**
+ * Stops the ongoing chat conversation.
+ * Closes the chat source and enables the chat.
+ */
 function stopChat() {
 	if (source) {
 		enableChat();
@@ -581,16 +649,30 @@ function stopChat() {
 	}
 }
 
+/**
+ * Attaches an event listener to the cancel chat button.
+ * Calls the stopChat function on click event.
+ */
 $(".btn-cancel-chat").on("click", function () {
 	stopChat();
 })
 
+/**
+ * Listens for the Escape key event.
+ * Calls the closeChat function when the Escape key is pressed.
+ */
 document.addEventListener("keydown", function (event) {
 	if (event.key === "Escape") {
 		closeChat();
 	}
 });
 
+/**
+ * Hides the chat element.
+ * Calls the hideFeedback and cancelSpeechSynthesis functions.
+ * Shows the hide-section and hides the chat-background.
+ * Hides the overflow-chat if the user agent matches the specified mobile devices.
+ */
 function hideChat() {
 	hideFeedback();
 	cancelSpeechSynthesis();
@@ -599,81 +681,90 @@ function hideChat() {
 	if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
 		$("#overflow-chat").hide();
 	}
-
 }
 
-// Agrega el evento para el botón "Enviar"
+/**
+ * Adds an event to the send button to submit the provided text. 
+ * Makes a POST call to the /store_text endpoint to store the text. 
+ * Handles errors and displays Toastr messages as necessary.
+ */
 $('#sendButton').click(function (evt) {
 	evt.preventDefault();
 
 	var textData = {
-		text: $('#textArea').val(),
+		text: $('#textArea').val(), // The text to be sent
 	};
 
-	// Configurar la posición de Toastr en la parte superior
+	// Set Toastr position to top
 	toastr.options.positionClass = 'toast-top-center';
 
-	// Verificar si la variable de texto está vacía
+	// Check if the text variable is empty
     if (textData.text.trim() === '') {
         toastr.error("Error: Text cannot be empty.");
         return;
     }
 
-	// Deshabilitar el botón y agregar un spinner
+	// Disable the button and add a spinner
     var sendButton = $('#sendButton');
     sendButton.prop('disabled', true);
     sendButton.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sending...');
 
-	// Realiza una llamada POST al endpoint /store_text
+	// Make a POST call to the /store_text endpoint
 	$.ajax({
 		type: "POST",
 		url: `/store_text/${uuid}`,
 		data: JSON.stringify(textData),
 		contentType: "application/json",
 		success: function (data) {
-			// Habilitar el botón nuevamente
+			// Enable the button again
             sendButton.prop('disabled', false);
             sendButton.html('Send');
 
 			$('#textArea').val('');
-			// Cierra el modal después de enviar el texto
+			// Close the modal after sending the text
 			textModal.hide();
 			displayChat(chatId);
 		},
         error: function (xhr, status, error) {
-            // Verificar si hay un código de error del backend
+            // Check if there is a backend error code
             if (xhr.status === 400 || xhr.status === 500) {
                 toastr.error(`Error: ${xhr.status} - ${error}`);
             } else {
                 toastr.error("Error: Connection refused. Please try again later.");
             }
 
-            // Habilitar el botón nuevamente
+            // Enable the button again
             sendButton.prop('disabled', false);
             sendButton.html('Send');
         }
 	});
 });
 
+
+/**
+ * Adds an event to the send button to upload the file. 
+ * Makes a POST call to the /upload_file endpoint to upload the file. 
+ * Handles errors and displays Toastr messages as necessary.
+ */
 $('#sendButton2').click(function (evt) {
     evt.preventDefault();
     var formData = new FormData($('#file-form')[0]);
     var sendButton = $('#sendButton2');
 
-    // Configurar la posición de Toastr en la parte superior
+    // Set Toastr position to top
     toastr.options.positionClass = 'toast-top-center';
 
     var fileInput = $('#fileInput')[0];
-    var fileSize = fileInput.files[0].size; // Tamaño en bytes
-    var maxSize = 1*1024*1024; // 1MB en bytes
+    var fileSize = fileInput.files[0].size; // Size in bytes
+    var maxSize = 1*1024*1024; // 1MB in bytes
 
-    // Validar el tamaño del archivo
+    // Validate the file size
     if (fileSize > maxSize) {
         toastr.error('Error: File size exceeds 1MB limit.');
         return;
     }
 
-    // Deshabilitar el botón y agregar un spinner
+    // Disable the button and add a spinner
     sendButton.prop('disabled', true);
     sendButton.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading...');
 
@@ -687,43 +778,47 @@ $('#sendButton2').click(function (evt) {
         processData: false,
         success: function (data) {
             $('#fileInput').val('');
-            // Habilitar el botón nuevamente
+            // Enable the button again
             sendButton.prop('disabled', false);
             sendButton.html('Send');
 
-            // Cierra el modal después de enviar el texto
+            // Close the modal after sending the text
             textModal.hide();
             displayChat(chatId);
         },
         error: function (xhr, status, error) {
-            // Mostrar mensaje de error con Toastr
+            // Show error message with Toastr
             toastr.error('Error uploading the file');
 
-            // Habilitar el botón nuevamente
+            // Enable the button again
             sendButton.prop('disabled', false);
             sendButton.html('Send');
         }
     });
 });
 
-
+/**
+ * Adds an event to the send button to send the URL. 
+ * Makes a POST call to the /store_text endpoint to send the URL. 
+ * Handles errors and displays Toastr messages as necessary.
+ */
 $('#sendButton3').click(function () {
     var textData = {
         html_url: $('#url').val(),
     };
 
-	// Configurar la posición de Toastr en la parte superior
+	// Set Toastr position to top
 	toastr.options.positionClass = 'toast-top-center';
 
     var sendButton = $('#sendButton3');
 
-    // Verificar si la variable de texto está vacía
+    // Check if the text variable is empty
     if (textData.html_url.trim() === '') {
         toastr.error("Error: URL cannot be empty.");
         return;
     }
 
-	// Validar la URL
+	// Validate the URL
     var urlRegex = new RegExp('^(https?:\\/\\/)?'+ 
     '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ 
     '((\\d{1,3}\\.){3}\\d{1,3}))'+ 
@@ -735,11 +830,11 @@ $('#sendButton3').click(function () {
         return;
     }
 
-    // Deshabilitar el botón y agregar un spinner
+    // Disable the button and add a spinner
     sendButton.prop('disabled', true);
     sendButton.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sending...');
 
-    // Realiza una llamada POST al endpoint /store_text
+    // Make a POST call to the /store_text endpoint
     $.ajax({
         type: "POST",
         url: `/store_text/${uuid}`,
@@ -747,11 +842,11 @@ $('#sendButton3').click(function () {
         contentType: "application/json",
         success: function (data) {
             $('#url').val('');
-			// Habilitar el botón nuevamente
+			// Enable the button again
             sendButton.prop('disabled', false);
             sendButton.html('Send');
 			
-            // Cierra el modal después de enviar el texto
+            // Close the modal after sending the text
             textModal.hide();
             displayChat(chatId);
         },
@@ -762,7 +857,7 @@ $('#sendButton3').click(function () {
                 toastr.error(`Error: ${xhr.status} - ${error}`);
             }
 
-            // Habilitar el botón nuevamente
+            // Enable the button again
             sendButton.prop('disabled', false);
             sendButton.html('Send');
         }
@@ -771,7 +866,10 @@ $('#sendButton3').click(function () {
 
 
 
-
+/**
+ * Attaches a click event to the elements with the "start-chat" class. 
+ * Displays different modals based on the data-index attribute of the clicked element.
+ */
 $(document).delegate(".start-chat", "click", function () {
 	chatId = $(this).attr("data-index");
 	if (chatId == 0) {
@@ -790,10 +888,13 @@ $(document).delegate(".start-chat", "click", function () {
 		});
 		textModal.show();
 	}
-	//console.log(chatId);
-	//displayChat($(this).attr("data-index"));
 })
 
+/**
+ * Displays the chat based on the provided index.
+ * Sets up the necessary variables and elements for the chat display.
+ * @param {number} index - The index of the chat to be displayed.
+ */
 function displayChat(index) {
 	data_index = index;
 	cancelSpeechSynthesis();
@@ -844,7 +945,11 @@ function displayChat(index) {
 	translate();
 }
 
-
+/**
+ * Escapes special characters in a string with their corresponding HTML codes.
+ * @param {string} str - The input string to be escaped.
+ * @returns {string} - The string with escaped characters.
+ */
 const escapeHtml = (str) => {
 
 	// Check if the string contains <code> or <pre> tags
@@ -883,7 +988,10 @@ const escapeHtml = (str) => {
 	return str;
 };
 
-// function to copy the text content
+/**
+ * Copies the text content to the clipboard.
+ * @param {HTMLElement} button - The button element that triggers the copy action.
+ */
 function copyText(button) {
 	const div = button.parentElement;
 	const code = div.querySelector('.chat-response');
@@ -896,7 +1004,10 @@ function copyText(button) {
 	button.innerHTML = lang["translate"][lang_index].copy_text2;
 }
 
-// Function to copy the content of the <pre> tag
+/**
+ * Copies the content of the <pre> tag to the clipboard.
+ * @param {HTMLElement} button - The button element that triggers the copy action.
+ */
 function copyCode(button) {
 	const pre = button.parentElement;
 	const code = pre.querySelector('code');
@@ -909,7 +1020,10 @@ function copyCode(button) {
 	button.innerHTML = lang["translate"][lang_index].copy_code2;
 }
 
-// Clear Chat
+/**
+ * Clears the chat history for the specified target. Displays a confirmation dialog before clearing.
+ * @param {string} target - The target for clearing the chat history. Can be "all" to clear all characters' chat history or "current" to clear the current character's chat history.
+ */
 function clearChat(target) {
 	// Display confirmation dialog using SweetAlert2 library
 	Swal.fire({
@@ -958,7 +1072,7 @@ function clearChat(target) {
 				"date": currentDate()
 			})
 			// Save updated character data to local storage
-			localStorage.setItem("oracle_chat_v1", JSON.stringify(array_widgets));
+			localStorage.setItem("text_talk_v1", JSON.stringify(array_widgets));
 
 			// If enabled, display welcome message for current character
 			if (displayWelcomeMessage) {
@@ -968,6 +1082,9 @@ function clearChat(target) {
 	})
 }
 
+/**
+ * Loads the chat history for the current character from the local storage.
+ */
 function loadChat() {
 	if (chat_history) {
 		checkClearChatDisplay();
@@ -1063,7 +1180,9 @@ function loadChat() {
 }
 
 
-//Check Clear Chat display
+/**
+ * Checks the display for the "Clear Chat" option based on the chat history for the current character.
+ */
 function checkClearChatDisplay() {
 	if (array_widgets[data_index] && array_widgets[data_index].last_chat && array_widgets[data_index].last_chat.length > 1) {
 		if (chat_history) {
@@ -1073,10 +1192,12 @@ function checkClearChatDisplay() {
 		$("#clear-chat").hide();
 	}
 
+	// Check if there is chat history for any character
 	const hasLastChat = array_widgets.some((result) => {
 		return result.last_chat && result.last_chat.length > 2;
 	});
 
+	// Display or hide the "Clear All Chats" option based on the presence of chat history
 	if (hasLastChat) {
 		$("#clear-all-chats").show();
 	} else {
@@ -1084,12 +1205,16 @@ function checkClearChatDisplay() {
 	}
 }
 
-//Error messages
+/**
+ * Hides the error messages shown on the screen.
+ */
 function hideFeedback() {
 	toastr.remove()
 }
 
-//Force chat to scroll down
+/**
+ * Forces the chat to scroll to the bottom of the conversation.
+ */
 function scrollChatBottom() {
 
 	if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
@@ -1110,7 +1235,9 @@ function scrollChatBottom() {
 
 }
 
-//Enable chat input
+/**
+ * Enables the chat input by setting the appropriate attributes and focusing on the chat input box.
+ */
 function enableChat() {
 	$(".character-typing").css('visibility', 'hidden')
 	$(".btn-send-chat,#chat").attr("disabled", false);
@@ -1122,10 +1249,11 @@ function enableChat() {
 			$('#chat').focus();
 		}, 500);
 	}
-
 }
 
-//Disable chat input
+/**
+ * Disables the chat input by setting the appropriate attributes and adjusting the visibility of certain elements.
+ */
 function disableChat() {
 	$(".character-typing").css('visibility', 'visible')
 	$(".character-typing").css('display', 'flex');
@@ -1135,6 +1263,11 @@ function disableChat() {
 	$(".btn-cancel-chat").show();
 }
 
+/**
+ * Creates a text file based on the data provided.
+ * @param {Array} data - An array containing chat data.
+ * @returns {Blob} A Blob object representing the text file.
+ */
 function createTextFile(data) {
 	let text = "";
 
@@ -1153,6 +1286,9 @@ function createTextFile(data) {
 	return blob;
 }
 
+/**
+ * Generates and downloads a PDF document based on the chat messages.
+ */
 function downloadPdf() {
 
 	var docDefinition = {
@@ -1210,7 +1346,11 @@ function downloadPdf() {
 	pdfMakeInstance.download('chat.pdf');
 }
 
-// Function to download the file
+/**
+ * Downloads a file with the provided Blob and filename.
+ * @param {Blob} blob - The Blob object to be downloaded.
+ * @param {string} fileName - The name of the file to be downloaded.
+ */
 function downloadFile(blob, fileName) {
 	// Create a URL object with the Blob
 	const url = URL.createObjectURL(blob);
@@ -1228,13 +1368,17 @@ function downloadFile(blob, fileName) {
 	document.body.removeChild(link);
 }
 
-// Function to handle the download button click event
+/**
+ * Handles the download button click event.
+ */
 function handleDownload() {
 	const blob = createTextFile(array_chat);
 	downloadFile(blob, "chat.txt");
 }
 
-//Chat audio
+/**
+ * Handles the chat audio functionality.
+ */
 $(document).on("click", ".chat-audio", function () {
 	var $this = $(this);
 	var $img = $this.find("img");
@@ -1253,16 +1397,21 @@ $(document).on("click", ".chat-audio", function () {
 	if (!play) {
 		cancelSpeechSynthesis();
 
-		// Remove botão de cópia do texto antes de sintetizar a fala
+		// Remove the text copy button before synthesizing speech
 		var chatResponseText = $chatResponse.html().replace(/<button\b[^>]*\bclass="[^"]*\bcopy-code\b[^"]*"[^>]*>.*?<\/button>/ig, "");
 
-		// Verifica se o recurso é suportado antes de chamar a função
+		// Checks if the feature is supported before calling the function
 		if ('speechSynthesis' in window) {
 			doSpeechSynthesis(chatResponseText, $chatResponse);
 		}
 	}
 });
 
+/**
+ * Cleans the string for speech synthesis by removing unwanted characters and tags.
+ * @param {string} str - The string to be cleaned.
+ * @returns {string} - The cleaned string.
+ */
 function cleanStringToSynthesis(str) {
 	str = str.trim()
 		.replace(/<[^>]*>/g, "")
@@ -1272,13 +1421,20 @@ function cleanStringToSynthesis(str) {
 	return str;
 }
 
+/**
+ * Cancels the ongoing speech synthesis.
+ */
 function cancelSpeechSynthesis() {
 	if (window.speechSynthesis) {
 		window.speechSynthesis.cancel();
 	}
 }
 
-
+/**
+ * Performs text-to-speech synthesis for long text.
+ * @param {string} longText - The long text to be synthesized.
+ * @param {jQuery} chatResponse - The jQuery element representing the chat response.
+ */
 function doSpeechSynthesis(longText, chatResponse) {
 
 	$("span.chat-response-highlight").each(function () {
@@ -1362,14 +1518,24 @@ function doSpeechSynthesis(longText, chatResponse) {
 	speakTextParts();
 }
 
+/**
+ * Callback function triggered when the available voices change.
+ * Retrieves the available text-to-speech voices.
+ */
 window.speechSynthesis.onvoiceschanged = function () {
 	getTextToSpeechVoices();
 };
 
+/**
+ * Displays the available voices in the console.
+ */
 function displayVoices() {
 	console.table(array_voices)
 }
 
+/**
+ * Retrieves the available text-to-speech voices.
+ */
 function getTextToSpeechVoices() {
 	window.speechSynthesis.getVoices().forEach(function (voice) {
 		const voiceObj = {
@@ -1380,21 +1546,27 @@ function getTextToSpeechVoices() {
 	});
 }
 
-//Display employees description
+/**
+ * Event listener to display the item's description when the default modal is shown.
+ * @param {Event} event - The event object.
+ */
 const myModalEl = document.getElementById('modalDefault')
 myModalEl.addEventListener('show.bs.modal', event => {
 	$("#modalDefault .modal-body").html(array_widgets[data_index].description);
 })
 
+/**
+ * Event listener to load the settings when the configuration modal is shown.
+ * Loads the settings upon page load.
+ */
 const myModalConfig = document.getElementById('modalConfig')
 myModalConfig.addEventListener('show.bs.modal', event => {
 	loadSettings(); // Cargar los ajustes al cargar la página
-	//console.log('Load settings');
-	//$("#modalConfig .modal-title").html(array_widgets[data_index].name);
-	//$("#modalConfig .modal-body").html(array_widgets[data_index].description);
 })
 
-// Define the key for the localStorage storage item
+/**
+ * Key for the localStorage storage item.
+ */
 const localStorageKey = "col-contacts-border-display";
 
 // Get the current display state of the div from localStorage, if it exists
@@ -1406,7 +1578,9 @@ if (displayState) {
 	$(".col-contacts-border").css("display", "none");
 }
 
-// Add the click event to toggle the display state of the div
+/**
+ * Add the click event to toggle the display state of the div.
+ */
 $(".toggle_employees_list").on("click", function () {
 	$(".col-contacts-border").toggle();
 
@@ -1417,7 +1591,9 @@ $(".toggle_employees_list").on("click", function () {
 	localStorage.setItem(localStorageKey, displayState);
 });
 
-
+/**
+ * Toastr options for displaying notifications.
+ */
 toastr.options = {
 	"closeButton": true,
 	"debug": false,
@@ -1436,12 +1612,19 @@ toastr.options = {
 	"hideMethod": "fadeOut"
 }
 
-
+// Select the chat textarea element
 const textarea = document.querySelector('#chat');
+
+// Select the microphone button element
 const microphoneButton = document.querySelector('#microphone-button');
 
+// Initialize a variable to keep track of whether the system is transcribing speech or not
 let isTranscribing = false; // Initially not transcribing
 
+/**
+ * Loads the speech recognition functionality if supported by the browser.
+ * Initiates the speech recognition functionality and handles the start and end events, as well as the result event.
+ */
 function loadSpeechRecognition() {
 	if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
 		recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
@@ -1467,16 +1650,16 @@ function loadSpeechRecognition() {
 			console.log('microphone off');
 			$(".btn-send-chat").attr("disabled", false);
 			$("#microphone-button").attr("src", "img/mic-start.svg")
-			isTranscribing = false; // Define a transcrição como encerrada
+			isTranscribing = false; // Define transcription as finished
 		});
 
 		microphoneButton.addEventListener('click', () => {
 			if (!isTranscribing) {
-				// Start transcription if not transcrivendo
+				// Start transcription if not already transcribing
 				recognition.start();
 				isTranscribing = true;
 			} else {
-				// Stop transcription if already transcribing
+				/// Stop transcription if already transcribing
 				recognition.stop();
 				isTranscribing = false;
 			}
@@ -1487,6 +1670,10 @@ function loadSpeechRecognition() {
 	}
 }
 
+/**
+ * Generates a unique identifier (UUID) using the current timestamp and a random number.
+ * @returns {string} A string representing the generated UUID.
+ */
 function generateUUID() {
 	let d = new Date().getTime();
 	if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
@@ -1499,23 +1686,29 @@ function generateUUID() {
 	});
 }
 
-// Función para cargar los datos del localStorage al formulario si están disponibles
+/**
+ * Loads the data from localStorage into the form if available.
+ */
 function loadSettings() {
 	const settings = getSettings();
 
-	// Cargando valores por defecto
+	/// Loading default values
 	$('#voiceOfPlayback').val(settings.voiceOfPlayback);
 	$('#microphoneLanguage').val(settings.microphoneLanguage);
 	$('#answersToggle').prop('checked', settings.answersToggle);
 }
 
+/**
+ * Retrieves the user settings from localStorage or creates and saves default settings if not found.
+ * @returns {object} - The user settings.
+ */
 function getSettings() {
 	let settings = '';
 	const textTalkSettings = localStorage.getItem('text-talk-settings');
 	if (textTalkSettings) {
 		settings = JSON.parse(textTalkSettings);
 	} else {
-		settings = createAndSaveSettings(); // Llama a la función para crear y guardar los ajustes si no se encuentran en el localStorage
+		settings = createAndSaveSettings(); // Calls the function to create and save settings if not found in localStorage
 	}
 	if(uuid == ''){
 		uuid = settings.id;
@@ -1523,7 +1716,10 @@ function getSettings() {
 	return settings;
 }
 
-// Función para crear y guardar los ajustes en el localStorage
+/**
+ * Creates and saves the settings in the localStorage.
+ * @returns {object} - The created settings.
+ */
 function createAndSaveSettings() {
 	const settings = {
 		id: generateUUID(),
@@ -1535,23 +1731,23 @@ function createAndSaveSettings() {
 	return settings;
 }
 
-// Verifica si la síntesis de voz es compatible con el navegador
+// Check if the voice synthesis is supported by the browser
 if ('speechSynthesis' in window) {
-	// Espera a que las voces estén cargadas antes de listarlas
+	// Wait for the voices to be loaded before listing them
 	window.speechSynthesis.onvoiceschanged = function () {
-		// Obtén todas las voces disponibles
+		// Get all available voices
 		const voices = speechSynthesis.getVoices();
 
-		// Filtra las voces que tienen 'en' como prefijo para identificar las voces en inglés
+		// Filter voices that have 'en' as a prefix to identify English voices
 		const englishVoices = voices.filter(voice => voice.lang.startsWith('en'));
 
-		// Obtén el elemento select por su id
+		// Get the select element by its id
 		const dropdown = document.getElementById('voiceOfPlayback');
 
-		// Eliminar las opciones anteriores del dropdown
+		// Remove previous options from the dropdown
 		dropdown.innerHTML = '';
 
-		// Pobla el dropdown con las voces en inglés disponibles
+		// Populate the dropdown with available English voices
 		englishVoices.forEach(function (voice) {
 			const option = document.createElement('option');
 			option.value = `${voice.lang}***${voice.name}`;
@@ -1560,23 +1756,23 @@ if ('speechSynthesis' in window) {
 		});
 	};
 } else {
-	console.error('La síntesis de voz no es compatible con este navegador.');
+	console.error('Voice synthesis is not supported by this browser.');
 }
 
-// Cargar idiomas de reconocimiento por micrófono
+// Load microphone recognition languages
 if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
 	const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
 
-	// Obtén los idiomas soportados para el reconocimiento de voz
+	// Get supported languages for voice recognition
 	const supportedLanguages = { 'en-US': 'Google US English', 'en-GB': 'Google UK English' };
 
-	// Obtener el elemento select por su id
+	// Get the select element by its id
 	const dropdown = document.getElementById('microphoneLanguage');
 
-	// Eliminar las opciones anteriores del dropdown
+	// Remove previous options from the dropdown
 	dropdown.innerHTML = '';
 
-	// Poblar el dropdown con los idiomas disponibles para el reconocimiento de voz
+	// Populate the dropdown with available languages for voice recognition
 	for (const langCode in supportedLanguages) {
 		if (Object.hasOwnProperty.call(supportedLanguages, langCode)) {
 			const langName = supportedLanguages[langCode];
@@ -1587,15 +1783,13 @@ if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
 		}
 	}
 } else {
-	console.error('El reconocimiento de voz no es compatible con este navegador.');
+	console.error('Voice recognition is not supported by this browser.');
 }
 
-
-
 $(document).ready(function () {
-	// Manejador de evento para guardar los ajustes al enviar el formulario
+	// Event handler for saving settings when submitting the form
 	$('#modal-settings-submit').click(function (event) {
-		event.preventDefault(); // Evitar que se envíe el formulario
+		event.preventDefault(); // Prevent the form from being submitted
 		let settings = getSettings();
 		settings = {
 			id: settings.id,
@@ -1608,7 +1802,7 @@ $(document).ready(function () {
 		$('#modalConfig').modal('hide');
 	});
 
-	// Maneja el conteo de caracteres
+	// Handle character count
 	$('#textArea').on('input', function () {
 		var maxLength = 4000;
 		var currentLength = $(this).val().length;
