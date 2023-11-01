@@ -28,6 +28,8 @@ At the core of **ScanUDoc** are Language Model (LLM) models, meticulously traine
 2. **Yes / No Question Classification Model**: With distilbert-base-uncased, ScanUDoc swiftly detects if a question warrants a simple "yes" or "no" response, enhancing user experience.
 3. **Yes / No Choice Model:** This model evaluates provided options to determine if the answer is "Yes" or "No," ensuring coherence and efficiency.
 
+![](assets/models-diagram.jpg)
+
 ### **Technology Stack**
 
 ![](assets/technology_stack.jpg)
@@ -38,6 +40,8 @@ The optimization approach has relied on the following tools from the **Intel® A
 2. **Intel® Neural Compressor:** Integrated to further optimize model inference, enabling more efficient use of resources and faster response times.
 3. **Intel® Distribution for Modin:** Essential for initial data analysis, facilitating efficient data exploration and enabling agile development of ScanUDoc.
 
+Overall, the achieved performance is 2.29x times faster compared to the baseline for the Extractive QA Model using IPEX’s optimizations from ***Intel® oneAPI AI Analytics Toolkit*** .
+
 ### **Architecture Diagram**
 
 ![](assets/architecture_diagram.jpg)
@@ -45,20 +49,25 @@ The optimization approach has relied on the following tools from the **Intel® A
 1. **Interactive Front-end:** The ScanUDoc front-end combines HTML, Bootstrap, and jQuery to create a user-friendly interface, promoting easy interaction with the system and access to essential chatbot functionalities.
 2. **Efficient Back-end:** The back-end development utilizes FastAPI, creating a robust system that rapidly and accurately processes user queries. It consults LLM models to deliver contextual and precise responses, ensuring a smooth user experience.
 
-### **Application Screenshoots**
+### **Application demo**
 
-![](assets/demo_1.jpg)
-![](assets/demo_2.jpg)
+![](assets/demo-scan-u-doc.gif)
 
 ### Project Structure
 
 **scan-u-doc**
 
-├─── assets        # Images
+├─── assets                              # Images
+├─── scripts                             # Scripts and notebooks
+|     ├── run_qa_finetune.sh             # Script for QA model finetuning (bash).
+|     ├── run_qa_finetune.bat            # Script for QA model finetuning (cmd).
+|     ├── qa_finetune.py                 # QA model finetuning generation.
+|     ├── is_boolean_classifier.ipynb    # Notebook for boolean question classifier model.
+|     ├── yes_no_answer.ipynb            # Notebook for yes/no answer detection model.
+|     └─── optimize-qa_xpu.ipynb         # Generate optimized QA model and benchmarking.
+|
+└─── webapp                              # Docker-enabled web application
 
-├─── models        # Trained LLM models
-
-└─── webapp        # Web application enabled for Docker deployment
 
 ### **Step-by-step instructions for deploying the solution**
 
@@ -66,7 +75,7 @@ The optimization approach has relied on the following tools from the **Intel® A
 * Clone the Repository
 
 ```python
- $ git clone https://github.com/roaltopo/scan-u-doc$ cd scan-u-doc
+$ git clone https://github.com/roaltopo/scan-u-doc$ cd scan-u-doc
 ```
 
 * Start the webapp demo.
@@ -75,7 +84,6 @@ The optimization approach has relied on the following tools from the **Intel® A
 # Docker command: build and start containers.
  $ docker-compose up --build
 ```
-
 
 * Go to: http://localhost:7860
 
