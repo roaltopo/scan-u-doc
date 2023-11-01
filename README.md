@@ -56,7 +56,7 @@ Overall, the achieved performance is 2.29x times faster compared to the baseline
 ### Project Structure
 
 **scan-u-doc**
-
+```
 ├─── assets                              # Images
 ├─── scripts                             # Scripts and notebooks
 |     ├── run_qa_finetune.sh             # Script for QA model finetuning (bash).
@@ -67,7 +67,7 @@ Overall, the achieved performance is 2.29x times faster compared to the baseline
 |     └─── optimize-qa_xpu.ipynb         # Generate optimized QA model and benchmarking.
 |
 └─── webapp                              # Docker-enabled web application
-
+```
 
 ### **Step-by-step instructions for deploying the solution**
 
